@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="icon" type="image/png" href="favicon.png">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6627434719090187"
+     crossorigin="anonymous"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>XDownload</title>
+<style>
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    background-image: url("sakura.jpg");
+    background-size: cover;
+  }
+  
+  .container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    flex-direction: column;
+    height: 33.33vh; /* 设置容器高度为页面高度的三分之一 */
+  }
+
+  .input-container {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .rounded-input {
+    width: 300px;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    outline: none;
+  }
+
+  .confirm-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background-color: rgb(255, 105, 180, 0.8);
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    outline: none;
+    cursor: pointer;
+  }
+
+  .stored-content {
+    margin-top: 10px;
+    border-top: 2px solid #ccc;
+    padding-top: 10px;
+    font-size: 14px;
+    color: #555;
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <div class="input-container">
+      <input id="input-field" type="text" class="rounded-input" placeholder="输入URL">
+      <button id="confirm-button" class="confirm-button">确定</button>
+    </div>
+    <div id="stored-content" class="stored-content"></div>
+  </div>
+  
+  <script>
+    const inputField = document.getElementById('input-field');
+    const confirmButton = document.getElementById('confirm-button');
+    const storedContentElement = document.getElementById('stored-content');
+    const outputConsoleElement = document.getElementById('output-console');
+	let storedContent = '';
+	
+	// 发送用户输入到后端的 Python 脚本
+	confirmButton.addEventListener('click', () => {
+	    const inputValue = inputField.value;
+	    sendInputToBackend(inputValue);
+	});
+	
+	async function sendInputToBackend(input) {
+	    try {
+	        const response = await fetch('backend.py', {
+	          method: 'POST',
+	          body: JSON.stringify({ input: input }),
+	          headers: {
+	            'Content-Type': 'application/json'
+	          }
+	        });
+	
+	        const responseData = await response.json();
+	        storedContentElement.textContent = responseData.result;
+	        inputField.value = ''; // 清空输入框内容
+			 // 获取后端输出文件的内容
+			const output = responseData.output;
+			outputConsoleElement.textContent = output;
+
+	      } catch (error) {
+	        console.error('Error:', error);
+	      }
+	    }
+
+    // 适应回车键的按下事件
+    inputField.addEventListener('keydown', (event) => {
+      if (event.keyCode === 13) {
+        storedContent = inputField.value;
+        storedContentElement.textContent = storedContent;
+        inputField.value = ''; // 清空输入框内容
+      }
+    });
+
+    // 确定按钮点击事件
+    confirmButton.addEventListener('click', () => {
+      storedContent = inputField.value;
+      storedContentElement.textContent = storedContent;
+      inputField.value = ''; // 清空输入框内容
+    });
+  </script>
+</body>
+</html>
